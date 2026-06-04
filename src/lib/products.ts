@@ -162,3 +162,5 @@ export const sortOptions = [
 ];
 
 export const brands = Array.from(new Set(products.map((p) => p.brand)));
+
+export const colors = Array.from(new Set(products.map((p) => p.attributes.color)));

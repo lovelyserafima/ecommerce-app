@@ -11,14 +11,29 @@ import SavedSearches from "@/components/SavedSearches";
 import SaveSearch from "@/components/SaveSearch";
 import BrandFilter from "@/components/BrandFilter";
 import PerPageSelect from "@/components/PerPageSelect";
+import { Metadata } from "next";
+import ColorFilter from "@/components/ColorFilter";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; category?: string; minPrice?: string; maxPrice?: string; 
+    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string;}>;
+}): Promise<Metadata> {
+  const { search, category } = await searchParams;
+  let title = "Product Catalog";
+  if (search) title = `"${search}" — Product Catalog`;
+  else if (category) title = `${category} — Product Catalog`;
+  return { title, description: "Search and filter products from thousands of sellers" };
+}
 
 export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{ search?: string; category?: string; minPrice?: string; maxPrice?: string; 
-    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string;}>;
+    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string;}>;
 }) {
-  const { search, category, minPrice, maxPrice, minRating, sort, page, perPage, brands } = await searchParams;
+  const { search, category, minPrice, maxPrice, minRating, sort, page, perPage, brands, colors } = await searchParams;
 
   let filtered = products.filter((p) => {
     const matchesSearch = search
@@ -29,7 +44,8 @@ export default async function ProductsPage({
     const matchesMaxPrice = maxPrice ? p.price <= Number(maxPrice) : true;
     const matchesMinRating = minRating ? p.rating.average >= Number(minRating) : true;
     const matchesBrands = brands ? brands.split(",").includes(p.brand) : true;
-    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesMinRating && matchesBrands;
+    const matchesColors = colors ? colors.split(",").includes(String(p.attributes.color)) : true;
+    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesMinRating && matchesBrands && matchesColors;
   });
 
   if (sort === "price_asc") {
@@ -70,6 +86,9 @@ export default async function ProductsPage({
             <BrandFilter />
           </div>
           <div className="mt-6">
+            <ColorFilter />
+          </div>
+          <div className="mt-6">
             <PerPageSelect />
           </div>
           <div className="mt-6">
@@ -96,7 +115,7 @@ export default async function ProductsPage({
                 currentPage={currentPage}
                 totalPages={totalPages}
                 searchParams={Object.fromEntries(
-                 Object.entries({ search, category, minPrice, maxPrice, minRating, sort, brands})
+                 Object.entries({ search, category, minPrice, maxPrice, minRating, sort, brands, colors})
                     .filter(([, v]) => v !== undefined) as [string, string][]
                 )}
             />
