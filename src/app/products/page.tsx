@@ -74,30 +74,30 @@ export default async function ProductsPage({
         <SearchBar />
       </div>
       <div className="flex gap-8">
-        <aside className="w-64 shrink-0">
+        <aside className="w-64 shrink-0 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-fit">
           <CategoryFilter />
-          <div className="mt-6">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <PriceFilter />
           </div>
-          <div className="mt-6">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <RatingFilter />
           </div>
-          <div className="mt-6">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <SortSelect />
           </div>
-          <div className="mt-6">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <BrandFilter />
           </div>
-          <div className="mt-6">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <ColorFilter />
           </div>
-          <div className="mt-6">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <PerPageSelect />
           </div>
-          <div className="mt-6">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <ResetFilters />
           </div>
-          <div className="mt-6">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <SavedSearches />
           </div>
         </aside>

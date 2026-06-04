@@ -2,11 +2,13 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { brands as brandList } from "@/lib/products";
+import { useState } from "react";
 
 export default function BrandFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selected = searchParams.get("brands");
+  const [isOpen, setIsOpen] = useState(true);
 
   function handleSelect(brand: string) {
     const current = searchParams.get("brands")?.split(",").filter(Boolean) ?? [];
@@ -25,7 +27,14 @@ export default function BrandFilter() {
 
   return (
     <div>
-      <h3 className="font-semibold mb-2">Brand</h3>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-full font-semibold mb-2"
+      >
+        <span>Brand</span>
+        <span>{isOpen ? "▲" : "▼"}</span>
+      </button>
+      {isOpen && (
       <ul className="space-y-1">
         {brandList.map((brand) => (
           <li key={brand}>
@@ -40,6 +49,7 @@ export default function BrandFilter() {
           </li>
         ))}
       </ul>
+      )}
     </div>
   );
 }
