@@ -16,7 +16,9 @@ export async function GET(request: Request) {
     filtered = filtered.filter(
       (product) =>
         product.name.toLowerCase().includes(search.toLowerCase()) ||
-        product.brand.toLowerCase().includes(search.toLowerCase())
+        product.brand.toLowerCase().includes(search.toLowerCase()) || 
+        product.description.toLowerCase().includes(search.toLowerCase()) || 
+        product.sku.toLowerCase() === search.toLowerCase()
     );
   }
 

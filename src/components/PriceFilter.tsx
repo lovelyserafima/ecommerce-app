@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function PriceFilter() {
   const router = useRouter();
@@ -9,8 +9,13 @@ export default function PriceFilter() {
 
   const [localMin, setLocalMin] = useState(Number(searchParams.get("minPrice") ?? 0));
   const [localMax, setLocalMax] = useState(Number(searchParams.get("maxPrice") ?? 5000));
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     const timer = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
       params.set("minPrice", localMin.toString());

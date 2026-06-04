@@ -17,4 +17,5 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   originalPrice?: number;
+  slug?: string;
 }

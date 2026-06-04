@@ -1,38 +1,46 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function SearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [value, setValue] = useState(searchParams.get("search") ?? "");
   const [suggestions, setSuggestions] = useState<{id: string, name: string}[]>([]);
-
-  const handleSearch = useCallback((val: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (val) {
-      params.set("search", val);
-    } else {
-      params.delete("search");
-    }
-    router.push(`/products?${params.toString()}`);
-  }, [router, searchParams]);
+  const isFirstRender = useRef(true);
+  const searchParamsRef = useRef(searchParams);
 
   useEffect(() => {
-    const fetchSuggestions = async () => {
-      const res = await fetch(`/api/products/search?q=${encodeURIComponent(value)}`);
-      const data = await res.json();
-      setSuggestions(value.length > 0 ? data : []);
-    };
+    searchParamsRef.current = searchParams;
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
 
     const timer = setTimeout(() => {
-      handleSearch(value);
-      fetchSuggestions();
+      const params = new URLSearchParams(searchParamsRef.current.toString());
+      if (value) {
+        params.set("search", value);
+      } else {
+        params.delete("search");
+      }
+      router.push(`/products?${params.toString()}`);
+
+      if (value.length > 1) {
+        fetch(`/api/products/search?q=${encodeURIComponent(value)}`)
+          .then(r => r.json())
+          .then(data => setSuggestions(data));
+      } else {
+        setSuggestions([]);
+      }
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [value, handleSearch]);
+  }, [value]);
 
   return (
     <div className="relative">

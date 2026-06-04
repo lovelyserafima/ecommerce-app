@@ -1,31 +1,35 @@
 "use client";
 
 import { Product } from "@/types/product";
-import Link from "next/link";
 import { useState } from "react";
 import QuickViewModal from "./QuickViewModal";
+import { toSlug } from "@/lib/products";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+
+  const router = useRouter();
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   return (
-    <div className="border rounded-lg p-4 group relative">
+    <div className="border rounded-lg p-4 group relative cursor-pointer" onClick={() => router.push(`/products/${toSlug(product.name)}`)}>
       <div className="w-full h-[192px] overflow-hidden rounded-t-lg relative">
         <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
         <button
-          onClick={() => setIsQuickViewOpen(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsQuickViewOpen(true);
+          }}
           className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white text-black text-sm px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition"
         >
           Quick View
         </button>
       </div>
-      <Link href={`/products/${product.id}`}>
-        <h2 className="text-xl font-bold mt-2 hover:underline">{product.name}</h2>
-      </Link>
+      <h2 className="text-xl font-bold mt-2 hover:underline">{product.name}</h2>
       <p className="text-gray-600">{product.brand}</p>
       {product.originalPrice && (
         <p className="text-gray-500 line-through">${product.originalPrice}</p>

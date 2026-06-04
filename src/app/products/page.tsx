@@ -18,7 +18,7 @@ export async function generateMetadata({
   searchParams,
 }: {
   searchParams: Promise<{ search?: string; category?: string; minPrice?: string; maxPrice?: string; 
-    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string;}>;
+    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string; sku?: string; description?: string;}>;
 }): Promise<Metadata> {
   const { search, category } = await searchParams;
   let title = "Product Catalog";
@@ -31,13 +31,14 @@ export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{ search?: string; category?: string; minPrice?: string; maxPrice?: string; 
-    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string;}>;
+    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string; sku?: string; description?: string;}>;
 }) {
-  const { search, category, minPrice, maxPrice, minRating, sort, page, perPage, brands, colors } = await searchParams;
+  const { search, category, minPrice, maxPrice, minRating, sort, page, perPage, brands, colors, sku, description } = await searchParams;
 
   let filtered = products.filter((p) => {
     const matchesSearch = search
-      ? p.name.toLowerCase().includes(search.toLowerCase())
+      ? p.name.toLowerCase().includes(search.toLowerCase()) || p.brand.toLowerCase().includes(search.toLowerCase()) || 
+      p.description.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase() === search.toLowerCase()
       : true;
     const matchesCategory = category ? p.category === category : true;
     const matchesMinPrice = minPrice ? p.price >= Number(minPrice) : true;
@@ -45,7 +46,9 @@ export default async function ProductsPage({
     const matchesMinRating = minRating ? p.rating.average >= Number(minRating) : true;
     const matchesBrands = brands ? brands.split(",").includes(p.brand) : true;
     const matchesColors = colors ? colors.split(",").includes(String(p.attributes.color)) : true;
-    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesMinRating && matchesBrands && matchesColors;
+    const matchesSku = sku ? p.sku === sku : true;
+    const matchesDescription = description ? p.description.toLowerCase().includes(description.toLowerCase()) : true;
+    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesMinRating && matchesBrands && matchesColors && matchesSku && matchesDescription;
   });
 
   if (sort === "price_asc") {
@@ -59,7 +62,7 @@ export default async function ProductsPage({
   }
 
   const currentPage = page ? Math.max(1, Number(page)) : 1;
-  const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 6;
+  const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 24;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -115,7 +118,7 @@ export default async function ProductsPage({
                 currentPage={currentPage}
                 totalPages={totalPages}
                 searchParams={Object.fromEntries(
-                 Object.entries({ search, category, minPrice, maxPrice, minRating, sort, brands, colors})
+                 Object.entries({ search, category, minPrice, maxPrice, minRating, sort, brands, colors, sku, description })
                     .filter(([, v]) => v !== undefined) as [string, string][]
                 )}
             />

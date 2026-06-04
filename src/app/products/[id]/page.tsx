@@ -1,9 +1,9 @@
-import { products } from "@/lib/products";
+import { getProductBySlug, products } from "@/lib/products";
 import { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const product = products.find((p) => p.id === id);
+  const product = getProductBySlug(id) || products.find((p) => p.id === id);
   if (!product) {
     return {
       title: "Product Not Found",
@@ -34,7 +34,7 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = products.find((p) => p.id === id);
+  const product = getProductBySlug(id) || products.find((p) => p.id === id);
     if (!product) {
         return (
             <main className="max-w-7xl mx-auto px-4 py-8">
