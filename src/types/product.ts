@@ -8,7 +8,7 @@ export interface Product {
     average: number;
     count: number;
   };
-  attributes: Record<string, string | number>;
+  attributes: Record<string, string | number | boolean>;
   brand: string;
   category: string;
   subcategory: string;
