@@ -13,6 +13,7 @@ import BrandFilter from "@/components/BrandFilter";
 import PerPageSelect from "@/components/PerPageSelect";
 import { Metadata } from "next";
 import ColorFilter from "@/components/ColorFilter";
+import SubcategoryFilter from "@/components/SubcategoryFilter";
 
 export async function generateMetadata({
   searchParams,
@@ -59,6 +60,17 @@ export default async function ProductsPage({
       filtered.sort((a, b) => b.rating.average - a.rating.average);
   } else if (sort === "newest") {
       filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } else if (sort === "popularity") {
+      filtered.sort((a, b) => b.rating.count - a.rating.count);
+  } else if (sort === "relevance" && search) {
+      const q = search.toLowerCase();
+      const score = (p: typeof filtered[0]) => {
+        if (p.name.toLowerCase() === q) return 3;
+        if (p.name.toLowerCase().includes(q)) return 2;
+        if (p.brand.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)) return 1;
+        return 0;
+      };
+      filtered.sort((a, b) => score(b) - score(a));
   }
 
   const currentPage = page ? Math.max(1, Number(page)) : 1;
@@ -68,14 +80,15 @@ export default async function ProductsPage({
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-8">
+    <main className="w-full max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Product Catalog</h1>
       <div className="mb-6">
         <SearchBar />
       </div>
       <div className="flex gap-8">
-        <aside className="w-64 shrink-0 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-fit">
+        <aside style={{ width: '256px', minWidth: '256px', maxWidth: '256px' }} className="shrink-0 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-fit overflow-hidden">
           <CategoryFilter />
+          <SubcategoryFilter />
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <PriceFilter />
           </div>
