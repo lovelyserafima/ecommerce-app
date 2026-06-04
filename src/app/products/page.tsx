@@ -10,6 +10,7 @@ import Pagination from "@/components/Pagination";
 import SavedSearches from "@/components/SavedSearches";
 import SaveSearch from "@/components/SaveSearch";
 import BrandFilter from "@/components/BrandFilter";
+import PerPageSelect from "@/components/PerPageSelect";
 
 export default async function ProductsPage({
   searchParams,
@@ -67,6 +68,12 @@ export default async function ProductsPage({
           </div>
           <div className="mt-6">
             <BrandFilter />
+          </div>
+          <div className="mt-6">
+            <PerPageSelect />
+          </div>
+          <div className="mt-6">
+            <ResetFilters />
           </div>
           <div className="mt-6">
             <SavedSearches />
