@@ -160,3 +160,5 @@ export const sortOptions = [
   { label: "Rating: High to Low", value: "rating_desc" },
   { label: "Newest Arrivals", value: "newest" },
 ];
+
+export const brands = Array.from(new Set(products.map((p) => p.brand)));

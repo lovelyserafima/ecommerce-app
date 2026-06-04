@@ -9,14 +9,15 @@ import ResetFilters from "@/components/ResetFilters";
 import Pagination from "@/components/Pagination";
 import SavedSearches from "@/components/SavedSearches";
 import SaveSearch from "@/components/SaveSearch";
+import BrandFilter from "@/components/BrandFilter";
 
 export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{ search?: string; category?: string; minPrice?: string; maxPrice?: string; 
-    minRating?: string; sort?: string; page?: string; perPage?: string;}>;
+    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string;}>;
 }) {
-  const { search, category, minPrice, maxPrice, minRating, sort, page, perPage } = await searchParams;
+  const { search, category, minPrice, maxPrice, minRating, sort, page, perPage, brands } = await searchParams;
 
   let filtered = products.filter((p) => {
     const matchesSearch = search
@@ -26,7 +27,8 @@ export default async function ProductsPage({
     const matchesMinPrice = minPrice ? p.price >= Number(minPrice) : true;
     const matchesMaxPrice = maxPrice ? p.price <= Number(maxPrice) : true;
     const matchesMinRating = minRating ? p.rating.average >= Number(minRating) : true;
-    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesMinRating;
+    const matchesBrands = brands ? brands.split(",").includes(p.brand) : true;
+    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesMinRating && matchesBrands;
   });
 
   if (sort === "price_asc") {
@@ -64,7 +66,7 @@ export default async function ProductsPage({
             <SortSelect />
           </div>
           <div className="mt-6">
-            <ResetFilters />
+            <BrandFilter />
           </div>
           <div className="mt-6">
             <SavedSearches />
@@ -87,7 +89,7 @@ export default async function ProductsPage({
                 currentPage={currentPage}
                 totalPages={totalPages}
                 searchParams={Object.fromEntries(
-                 Object.entries({ search, category, minPrice, maxPrice, minRating, sort })
+                 Object.entries({ search, category, minPrice, maxPrice, minRating, sort, brands})
                     .filter(([, v]) => v !== undefined) as [string, string][]
                 )}
             />
