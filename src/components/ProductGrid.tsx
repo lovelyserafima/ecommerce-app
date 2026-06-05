@@ -20,7 +20,7 @@ export default function ProductGrid({ initialProducts, total, filterParams, perP
 
   useEffect(() => {
     function handleScroll() {
-      const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 1000;
+      const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 1500;
       if (nearBottom && !loading && hasMore) {
         loadMore();
       }
