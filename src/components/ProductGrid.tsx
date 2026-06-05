@@ -15,21 +15,23 @@ export default function ProductGrid({ initialProducts, total, filterParams, perP
   const [productList, setProductList] = useState(initialProducts);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const loadingRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const hasMore = productList.length < total;
 
   useEffect(() => {
     function handleScroll() {
       const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 1500;
-      if (nearBottom && !loading && hasMore) {
+      if (nearBottom && !loadingRef.current && hasMore) {
         loadMore();
       }
     }
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [loading, hasMore, page]);
+  }, [hasMore, page]);
 
   async function loadMore() {
+    loadingRef.current = true;
     setLoading(true);
     const nextPage = page + 1;
     const params = new URLSearchParams({
@@ -41,6 +43,7 @@ export default function ProductGrid({ initialProducts, total, filterParams, perP
     const data = await res.json();
     setProductList((prev) => [...prev, ...data.products]);
     setPage(nextPage);
+    loadingRef.current = false;
     setLoading(false);
   }
 
