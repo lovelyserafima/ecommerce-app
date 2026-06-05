@@ -1,25 +1,26 @@
 import { products } from "@/lib/products";
-import ProductCard from "@/components/ProductCard";
+import ProductGrid from "@/components/ProductGrid";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import PriceFilter from "@/components/PriceFilter";
 import RatingFilter from "@/components/RatingFilter";
 import SortSelect from "@/components/SortSelect";
 import ResetFilters from "@/components/ResetFilters";
-import Pagination from "@/components/Pagination";
 import SavedSearches from "@/components/SavedSearches";
 import SaveSearch from "@/components/SaveSearch";
 import BrandFilter from "@/components/BrandFilter";
 import PerPageSelect from "@/components/PerPageSelect";
 import { Metadata } from "next";
-import ColorFilter from "@/components/ColorFilter";
 import SubcategoryFilter from "@/components/SubcategoryFilter";
+import AvailabilityFilter from "@/components/AvailabilityFilter";
+import AttributeFilter from "@/components/AttributeFilter";
 
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; category?: string; minPrice?: string; maxPrice?: string; 
-    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string; sku?: string; description?: string;}>;
+  searchParams: Promise<{ search?: string; category?: string; subcategory?: string; minPrice?: string; maxPrice?: string; 
+    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string; availability?: string; 
+    sizes?: string; materials?: string; sku?: string; description?: string;}>;
 }): Promise<Metadata> {
   const { search, category } = await searchParams;
   let title = "Product Catalog";
@@ -32,9 +33,11 @@ export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{ search?: string; category?: string; subcategory?: string; minPrice?: string; maxPrice?: string;
-    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string; sku?: string; description?: string;}>;
+    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; color?: string;
+    size?: string; material?: string; availability?: string; sku?: string; description?: string; }>;
 }) {
-  const { search, category, subcategory, minPrice, maxPrice, minRating, sort, page, perPage, brands, colors, sku, description } = await searchParams;
+  const { search, category, subcategory, minPrice, maxPrice, minRating, sort, page, perPage, brands, color,
+    size, material, availability, sku, description } = await searchParams;
 
   let filtered = products.filter((p) => {
     const matchesSearch = search
@@ -47,10 +50,15 @@ export default async function ProductsPage({
     const matchesMaxPrice = maxPrice ? p.price <= Number(maxPrice) : true;
     const matchesMinRating = minRating ? p.rating.average >= Number(minRating) : true;
     const matchesBrands = brands ? brands.split(",").includes(p.brand) : true;
-    const matchesColors = colors ? colors.split(",").includes(String(p.attributes.color)) : true;
+    const matchesColors = color ? color.split(",").includes(String(p.attributes.color)) : true;
+    const matchesSizes = size ? size.split(",").includes(String(p.attributes.size)) : true;
+    const matchesMaterials = material ? material.split(",").includes(String(p.attributes.material)) : true;
+    const matchesAvailability = availability ? p.availability === availability : true;
     const matchesSku = sku ? p.sku === sku : true;
     const matchesDescription = description ? p.description.toLowerCase().includes(description.toLowerCase()) : true;
-    return matchesSearch && matchesCategory && matchesSubcategory && matchesMinPrice && matchesMaxPrice && matchesMinRating && matchesBrands && matchesColors && matchesSku && matchesDescription;
+    return matchesSearch && matchesCategory && matchesSubcategory && matchesMinPrice && matchesMaxPrice && 
+    matchesMinRating && matchesBrands && matchesColors && matchesSizes && matchesMaterials && 
+    matchesAvailability && matchesSku && matchesDescription;
   });
 
   if (sort === "price_asc") {
@@ -75,10 +83,9 @@ export default async function ProductsPage({
   }
 
   const currentPage = page ? Math.max(1, Number(page)) : 1;
-  const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 24;
+  const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 9;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   return (
     <main className="w-full max-w-7xl mx-auto px-4 py-8">
@@ -103,7 +110,16 @@ export default async function ProductsPage({
             <BrandFilter />
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <ColorFilter />
+            <AttributeFilter attribute="color" label="Color" />
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <AttributeFilter attribute="size" label="Size" />
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <AttributeFilter attribute="material" label="Material" />
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <AvailabilityFilter />
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <PerPageSelect />
@@ -119,23 +135,16 @@ export default async function ProductsPage({
           <div className="flex justify-end mb-4">
             <SaveSearch />
           </div>
-            {paginated.length === 0 ? (
-                <p className="text-gray-500">No products found. Try adjusting your filters.</p>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {paginated.map((product) => (
-                         <ProductCard key={product.id} product={product} />
-                    ))}
-                 </div>
-                )}
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                searchParams={Object.fromEntries(
-                 Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating, sort, brands, colors, sku, description })
-                    .filter(([, v]) => v !== undefined) as [string, string][]
-                )}
-            />
+          <ProductGrid
+            key={JSON.stringify({ search, category, subcategory, minPrice, maxPrice, minRating, brands, color, size, material, availability, sort, perPage })}
+            initialProducts={paginated}
+            total={filtered.length}
+            filterParams={Object.fromEntries(
+              Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating, sort, brands, color, size, material, availability })
+                .filter(([, v]) => v !== undefined) as [string, string][]
+            )}
+            perPage={itemsPerPage}
+          />
         </div>
       </div>
     </main>

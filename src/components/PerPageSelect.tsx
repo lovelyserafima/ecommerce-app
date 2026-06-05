@@ -5,8 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function PerPageSelect() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const perPage = searchParams.get("perPage") ?? "24";
-
+  const perPage = searchParams.get("perPage") ?? "9";
   function handleChange(value: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("perPage", value);
@@ -22,7 +21,7 @@ export default function PerPageSelect() {
         onChange={(e) => handleChange(e.target.value)}
         className="border rounded px-2 py-1"
       >
-        {[24, 48, 72].map((n) => (
+        {[9, 18, 27].map((n) => (
           <option key={n} value={n}>{n}</option>
         ))}
       </select>
