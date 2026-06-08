@@ -4,35 +4,65 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const MAX_RECENT = 5;
+const FILTER_KEYS = ["category", "brands", "minPrice", "maxPrice", "minRating", "color", "size", "material", "availability"];
+
+function buildLabel(searchParams: URLSearchParams): string {
+  const parts: string[] = [];
+  const search = searchParams.get("search");
+  if (search) parts.push(`"${search}"`);
+  if (searchParams.get("category")) parts.push(searchParams.get("category")!);
+  if (searchParams.get("brands")) parts.push(searchParams.get("brands")!);
+  const min = searchParams.get("minPrice");
+  const max = searchParams.get("maxPrice");
+  if (min || max) parts.push(`$${min ?? 0}–$${max ?? "∞"}`);
+  if (searchParams.get("minRating")) parts.push(`${searchParams.get("minRating")}★+`);
+  return parts.join(" · ") || "All products";
+}
 
 export default function SavedSearches() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<{ name: string; params: string }[]>([]);
 
   useEffect(() => {
-    setRecentSearches(JSON.parse(localStorage.getItem("recentSearches") ?? "[]"));
+    const raw = JSON.parse(localStorage.getItem("recentSearches") ?? "[]");
+    // Guard against old format (string[]) from previous version
+    const valid = Array.isArray(raw)
+      ? raw.filter((s): s is { name: string; params: string } =>
+          typeof s === "object" && s !== null && typeof s.name === "string" && typeof s.params === "string"
+        )
+      : [];
+    setRecentSearches(valid);
     setMounted(true);
   }, []);
 
-  // Auto-save when user performs a search
   useEffect(() => {
-    const term = searchParams.get("search")?.trim();
-    if (!term) return;
+    const search = searchParams.get("search") ?? "";
+    const hasFilters = FILTER_KEYS.some((k) => searchParams.get(k));
 
-    setRecentSearches((prev) => {
-      const updated = [term, ...prev.filter((s) => s !== term)].slice(0, MAX_RECENT);
-      localStorage.setItem("recentSearches", JSON.stringify(updated));
-      return updated;
-    });
-  }, [searchParams.get("search")]);
+    // Skip if search term is too short and no other filters
+    if (search.length < 2 && !hasFilters) return;
+
+    // Debounce so intermediate keystrokes don't get saved
+    const timer = setTimeout(() => {
+      const params = searchParams.toString();
+      const name = buildLabel(searchParams);
+      setRecentSearches((prev) => {
+        const updated = [{ name, params }, ...prev.filter((s) => s.params !== params)].slice(0, MAX_RECENT);
+        localStorage.setItem("recentSearches", JSON.stringify(updated));
+        return updated;
+      });
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [searchParams.toString()]);
 
   if (!mounted || recentSearches.length === 0) return null;
 
-  function remove(term: string) {
+  function remove(params: string) {
     setRecentSearches((prev) => {
-      const updated = prev.filter((s) => s !== term);
+      const updated = prev.filter((s) => s.params !== params);
       localStorage.setItem("recentSearches", JSON.stringify(updated));
       return updated;
     });
@@ -44,7 +74,7 @@ export default function SavedSearches() {
   }
 
   return (
-    <div>
+    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-semibold">Recent Searches</h3>
         <button
@@ -55,17 +85,17 @@ export default function SavedSearches() {
         </button>
       </div>
       <ul className="space-y-1">
-        {recentSearches.map((term) => (
-          <li key={term} className="flex items-center justify-between group">
+        {recentSearches.map((item) => (
+          <li key={item.params} className="flex items-center justify-between group">
             <button
-              onClick={() => router.push(`/products?search=${encodeURIComponent(term)}`)}
-              className="text-sm text-blue-500 hover:underline truncate"
+              onClick={() => router.push(`/products?${item.params}`)}
+              className="text-sm text-blue-500 hover:underline truncate text-left"
             >
-              {term}
+              {item.name}
             </button>
             <button
-              onClick={() => remove(term)}
-              className="text-xs text-gray-300 hover:text-red-400 ml-1 opacity-0 group-hover:opacity-100"
+              onClick={() => remove(item.params)}
+              className="text-xs text-gray-300 hover:text-red-400 ml-1 opacity-0 group-hover:opacity-100 shrink-0"
             >
               ✕
             </button>

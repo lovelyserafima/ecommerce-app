@@ -85,9 +85,7 @@ export default async function ProductsPage({
           <ErrorBoundary>
           <FiltersProvider products={allProducts}>
           <ResetFilters />
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <SavedSearches />
-          </div>
+          <SavedSearches />
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <CategoryFilter />
           </div>
