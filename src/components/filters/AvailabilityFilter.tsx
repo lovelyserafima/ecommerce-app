@@ -15,7 +15,6 @@ export default function AvailabilityFilter() {
 
   const availabilities = [
     { value: "in_stock", label: "In Stock" },
-    { value: "out_of_stock", label: "Out of Stock" },
     { value: "pre_order", label: "Pre-order" },
   ].filter(({ value }) => availableValues.has(value));
 
