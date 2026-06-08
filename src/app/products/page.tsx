@@ -1,6 +1,5 @@
 import { products } from "@/lib/products";
 import ProductGrid from "@/components/ProductGrid";
-import Pagination from "@/components/Pagination";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import PriceFilter from "@/components/PriceFilter";
@@ -137,12 +136,14 @@ export default async function ProductsPage({
             <SaveSearch />
           </div>
           <ProductGrid
-            products={paginated}
-          />
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            searchParams={paginationParams}
+            key={JSON.stringify({ search, category, subcategory, minPrice, maxPrice, minRating, brands, color, size, material, availability, sort, perPage })}
+            initialProducts={paginated}
+            total={filtered.length}
+            filterParams={Object.fromEntries(
+              Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating, sort, brands, color, size, material, availability })
+                .filter(([, v]) => v !== undefined) as [string, string][]
+            )}
+            perPage={itemsPerPage}
           />
         </div>
       </div>
