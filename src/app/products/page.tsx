@@ -116,15 +116,9 @@ export default async function ProductsPage({
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <BrandFilter />
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <AttributeFilter attribute="color" label="Color" />
-          </div>
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <AttributeFilter attribute="size" label="Size" />
-          </div>
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <AttributeFilter attribute="material" label="Material" />
-          </div>
+          <AttributeFilter attribute="color" label="Color" />
+          <AttributeFilter attribute="size" label="Size" />
+          <AttributeFilter attribute="material" label="Material" />
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <AvailabilityFilter />
           </div>

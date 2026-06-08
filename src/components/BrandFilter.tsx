@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { brands as brandList } from "@/lib/products";
+import { applyFilters } from "@/lib/filterProducts";
 import { useState } from "react";
 
 export default function BrandFilter() {
@@ -9,6 +9,10 @@ export default function BrandFilter() {
   const searchParams = useSearchParams();
   const selected = searchParams.get("brands");
   const [isOpen, setIsOpen] = useState(true);
+
+  const brandList = Array.from(new Set(
+    applyFilters(searchParams, ["brands"]).map(p => p.brand)
+  )).sort();
 
   function handleSelect(brand: string) {
     const current = searchParams.get("brands")?.split(",").filter(Boolean) ?? [];

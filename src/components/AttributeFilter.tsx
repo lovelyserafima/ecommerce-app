@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { products } from "@/lib/products";
+import { applyFilters } from "@/lib/filterProducts";
 import { useState } from "react";
 
 interface Props {
@@ -11,12 +11,17 @@ interface Props {
 
 export default function AttributeFilter({ attribute, label }: Props) {
   const router = useRouter();
-  const values = Array.from(
-    new Set(products.map(p => String(p.attributes[attribute])).filter(v => v !== "undefined"))
-  );
   const searchParams = useSearchParams();
+
+  const available = applyFilters(searchParams, [attribute]);
+  const values = Array.from(
+    new Set(available.map(p => String(p.attributes[attribute])).filter(v => v !== "undefined"))
+  );
+
   const selected = searchParams.get(attribute);
   const [isOpen, setIsOpen] = useState(true);
+
+  if (!searchParams.get("category") || values.length === 0) return null;
 
   function handleSelect(value: string) {
     const current = searchParams.get(attribute)?.split(",").filter(Boolean) ?? [];
@@ -34,7 +39,7 @@ export default function AttributeFilter({ attribute, label }: Props) {
   }
 
   return (
-    <div>
+    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between w-full font-semibold mb-2"

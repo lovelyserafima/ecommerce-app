@@ -1,16 +1,21 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { applyFilters } from "@/lib/filterProducts";
 
 export default function AvailabilityFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selected = searchParams.get("availability");
+
+  const available = applyFilters(searchParams, ["availability"]);
+  const availableValues = new Set(available.map(p => p.availability));
+
   const availabilities = [
     { value: "in_stock", label: "In Stock" },
     { value: "out_of_stock", label: "Out of Stock" },
     { value: "pre_order", label: "Pre-order" },
-  ];
+  ].filter(({ value }) => availableValues.has(value));
 
   function handleSelect(availability: string) {
     const params = new URLSearchParams(searchParams.toString());
