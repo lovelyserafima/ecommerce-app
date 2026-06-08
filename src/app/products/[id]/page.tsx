@@ -1,6 +1,7 @@
 import { getProduct } from "@/services/productService";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -25,6 +26,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-8">
+      <Link href="/products" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 mb-6">
+        ← Back to Catalog
+      </Link>
       <div className="flex flex-col md:flex-row gap-8">
         <img src={product.images[0]} alt={product.name} className="w-full md:w-1/2 rounded-lg" />
         <div className="flex-1">
