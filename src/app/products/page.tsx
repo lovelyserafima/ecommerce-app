@@ -1,5 +1,6 @@
 import { products } from "@/lib/products";
 import ProductGrid from "@/components/ProductGrid";
+import Pagination from "@/components/Pagination";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import PriceFilter from "@/components/PriceFilter";
@@ -83,9 +84,15 @@ export default async function ProductsPage({
   }
 
   const currentPage = page ? Math.max(1, Number(page)) : 1;
-  const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 9;
+  const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 24;
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
+
+  const paginationParams = Object.fromEntries(
+    Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating, sort, brands, color, size, material, availability, perPage })
+      .filter(([, v]) => v !== undefined) as [string, string][]
+  );
 
   return (
     <main className="w-full max-w-7xl mx-auto px-4 py-8">
@@ -136,14 +143,12 @@ export default async function ProductsPage({
             <SaveSearch />
           </div>
           <ProductGrid
-            key={JSON.stringify({ search, category, subcategory, minPrice, maxPrice, minRating, brands, color, size, material, availability, sort, perPage })}
-            initialProducts={paginated}
-            total={filtered.length}
-            filterParams={Object.fromEntries(
-              Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating, sort, brands, color, size, material, availability })
-                .filter(([, v]) => v !== undefined) as [string, string][]
-            )}
-            perPage={itemsPerPage}
+            products={paginated}
+          />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            searchParams={paginationParams}
           />
         </div>
       </div>
