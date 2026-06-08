@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import * as Slider from "@radix-ui/react-slider";
 import { useProducts } from "@/components/filters/FiltersProvider";
 import { applyFilters } from "@/lib/filterProducts";
 
@@ -10,7 +11,6 @@ export default function PriceFilter() {
   const searchParams = useSearchParams();
   const allProducts = useProducts();
 
-  // Price range derived from products matching all active filters except price itself
   const { priceMin, priceMax } = useMemo(() => {
     const filtered = applyFilters(allProducts, searchParams, ["minPrice", "maxPrice"]);
     if (filtered.length === 0) return { priceMin: 0, priceMax: 5000 };
@@ -31,7 +31,6 @@ export default function PriceFilter() {
     urlMax !== null ? Number(urlMax) : priceMax
   );
 
-  // Sync sliders when URL changes externally (Clear All, other filters changing range)
   useEffect(() => {
     const newMin = urlMin !== null ? Number(urlMin) : priceMin;
     const newMax = urlMax !== null ? Number(urlMax) : priceMax;
@@ -39,7 +38,6 @@ export default function PriceFilter() {
     setLocalMax(Math.max(priceMin, Math.min(priceMax, newMax)));
   }, [urlMin, urlMax, priceMin, priceMax]);
 
-  // Push to URL when user drags slider; skip if values are at the boundaries (= no filter)
   useEffect(() => {
     const prevMin = searchParams.get("minPrice");
     const prevMax = searchParams.get("maxPrice");
@@ -60,16 +58,33 @@ export default function PriceFilter() {
 
   return (
     <div>
-      <h3 className="font-semibold mb-2">Price</h3>
+      <h3 className="font-semibold mb-3">Price</h3>
       {priceMin === priceMax ? (
         <div className="text-sm text-gray-500">${priceMin}</div>
       ) : (
         <>
-          <div className="flex flex-col gap-2">
-            <input type="range" min={priceMin} max={priceMax} value={localMin} onChange={(e) => setLocalMin(Number(e.target.value))} />
-            <input type="range" min={priceMin} max={priceMax} value={localMax} onChange={(e) => setLocalMax(Number(e.target.value))} />
+          <Slider.Root
+            className="relative flex items-center w-full h-5 select-none touch-none"
+            min={priceMin}
+            max={priceMax}
+            step={1}
+            value={[localMin, localMax]}
+            onValueChange={([min, max]) => {
+              setLocalMin(min);
+              setLocalMax(max);
+            }}
+          >
+            <Slider.Track className="relative bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 flex-1">
+              <Slider.Range className="absolute bg-blue-500 rounded-full h-full" />
+            </Slider.Track>
+            <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <Slider.Thumb className="block w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          </Slider.Root>
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>${priceMin}</span>
+            <span>${priceMax}</span>
           </div>
-          <div className="text-sm mt-2">${localMin} – ${localMax}</div>
+          <div className="text-sm mt-1 text-center">${localMin} – ${localMax}</div>
         </>
       )}
     </div>
