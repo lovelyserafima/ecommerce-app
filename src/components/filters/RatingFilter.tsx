@@ -1,12 +1,23 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { RATING_OPTIONS } from "@/lib/constants";
+import { useProducts } from "@/components/filters/FiltersProvider";
+import { applyFilters } from "@/lib/filterProducts";
 
 export default function RatingFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const allProducts = useProducts();
   const selected = searchParams.get("minRating");
+
+  const ratings = Array.from(
+    new Set(
+      applyFilters(allProducts, searchParams, ["minRating"])
+        .map((p) => Math.floor(p.rating.average))
+    )
+  ).sort((a, b) => a - b);
+
+  const options = ratings.slice(1); // skip the lowest — it's the default (show all)
 
   function handleSelect(rating: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -22,7 +33,7 @@ export default function RatingFilter() {
     <div>
       <h3 className="font-semibold mb-2">Rating</h3>
       <ul className="space-y-1">
-        {RATING_OPTIONS.map((rating) => (
+        {options.map((rating) => (
           <li key={rating}>
             <button
               onClick={() => handleSelect(rating.toString())}
