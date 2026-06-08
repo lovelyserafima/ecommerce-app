@@ -4,13 +4,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const MAX_RECENT = 5;
-const FILTER_KEYS = ["category", "brands", "minPrice", "maxPrice", "minRating", "color", "size", "material", "availability"];
+const FILTER_KEYS = ["category", "subcategory", "brands", "minPrice", "maxPrice", "minRating", "color", "size", "material", "availability"];
 
 function buildLabel(searchParams: URLSearchParams): string {
   const parts: string[] = [];
   const search = searchParams.get("search");
   if (search) parts.push(`"${search}"`);
-  if (searchParams.get("category")) parts.push(searchParams.get("category")!);
+  const category = searchParams.get("category");
+  const subcategory = searchParams.get("subcategory");
+  if (category && subcategory) parts.push(`${category} > ${subcategory}`);
+  else if (category) parts.push(category);
   if (searchParams.get("brands")) parts.push(searchParams.get("brands")!);
   const min = searchParams.get("minPrice");
   const max = searchParams.get("maxPrice");
