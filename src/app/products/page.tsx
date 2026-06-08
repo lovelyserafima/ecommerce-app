@@ -17,6 +17,8 @@ import AvailabilityFilter from "@/components/filters/AvailabilityFilter";
 import AttributeFilter from "@/components/filters/AttributeFilter";
 import { FiltersProvider } from "@/components/filters/FiltersProvider";
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = {
   search?: string;
   category?: string;
