@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import SortSelect from "@/components/ui/SortSelect";
-import { sortOptions } from "@/lib/products";
+import { SORT_OPTIONS } from "@/lib/constants";
 
 const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({
@@ -24,7 +24,7 @@ describe("SortSelect", () => {
 
   it("renders all sort options", () => {
     render(<SortSelect />);
-    for (const option of sortOptions) {
+    for (const option of SORT_OPTIONS) {
       expect(screen.getByText(option.label)).toBeInTheDocument();
     }
   });
@@ -32,10 +32,10 @@ describe("SortSelect", () => {
   it("calls router.push with sort param on change", () => {
     render(<SortSelect />);
     fireEvent.change(screen.getByRole("combobox"), {
-      target: { value: sortOptions[0].value },
+      target: { value: SORT_OPTIONS[0].value },
     });
     expect(mockPush).toHaveBeenCalledWith(
-      expect.stringContaining(`sort=${sortOptions[0].value}`)
+      expect.stringContaining(`sort=${SORT_OPTIONS[0].value}`)
     );
   });
 });

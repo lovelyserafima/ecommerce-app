@@ -3,7 +3,6 @@
 import { Product } from "@/types/product";
 import { useState } from "react";
 import QuickViewModal from "./QuickViewModal";
-import { toSlug } from "@/lib/products";
 import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
@@ -11,12 +10,11 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-
   const router = useRouter();
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   return (
-    <div className="border rounded-lg p-4 group relative cursor-pointer" onClick={() => router.push(`/products/${toSlug(product.name)}`)}>
+    <div className="border rounded-lg p-4 group relative cursor-pointer" onClick={() => router.push(`/products/${product.slug}`)}>
       <div className="w-full h-[192px] overflow-hidden rounded-t-lg relative">
         <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
         <button

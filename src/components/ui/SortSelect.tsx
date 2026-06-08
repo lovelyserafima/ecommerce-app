@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { sortOptions } from "@/lib/products";
+import { SORT_OPTIONS } from "@/lib/constants";
 
 export default function SortSelect() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export default function SortSelect() {
         className="border rounded-lg px-4 py-2 w-full"
       >
         <option value="">Default</option>
-        {sortOptions.map((option) => (
+        {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

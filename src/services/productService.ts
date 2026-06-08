@@ -1,8 +1,6 @@
 import type { IProductRepository } from "@/repositories/IProductRepository";
 import { PrismaProductRepository } from "@/repositories/PrismaProductRepository";
 import { MockProductRepository } from "@/repositories/MockProductRepository";
-import { applyFilters, applySort } from "@/lib/filterProducts";
-import { DEFAULT_PER_PAGE } from "@/lib/constants";
 import type { Product } from "@/types/product";
 
 function getRepository(): IProductRepository {
@@ -38,19 +36,15 @@ export type ProductsResult = {
 
 export async function getProducts(query: ProductQuery): Promise<ProductsResult> {
   const repository = getRepository();
-  const allProducts = await repository.findAll();
 
-  const urlParams = new URLSearchParams(
-    Object.entries(query)
-      .filter(([k, v]) => v !== undefined && v !== null && k !== "page" && k !== "perPage")
-      .map(([k, v]) => [k, String(v)])
-  );
+  const [{ products, total }, allProducts] = await Promise.all([
+    repository.findMany(query),
+    repository.findAll(),
+  ]);
 
-  const filtered = applySort(applyFilters(allProducts, urlParams), query.sort ?? null, query.search);
+  return { products, total, allProducts };
+}
 
-  const page = query.page ?? 1;
-  const perPage = query.perPage ?? DEFAULT_PER_PAGE;
-  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
-
-  return { products: paginated, total: filtered.length, allProducts };
+export async function getProduct(id: string): Promise<Product | null> {
+  return getRepository().findById(id);
 }

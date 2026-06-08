@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { ratings } from "@/lib/products";
+import { RATING_OPTIONS } from "@/lib/constants";
 
 export default function RatingFilter() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function RatingFilter() {
     <div>
       <h3 className="font-semibold mb-2">Rating</h3>
       <ul className="space-y-1">
-        {ratings.map((rating) => (
+        {RATING_OPTIONS.map((rating) => (
           <li key={rating}>
             <button
               onClick={() => handleSelect(rating.toString())}
@@ -31,7 +31,6 @@ export default function RatingFilter() {
               }`}
             >
               ⭐ {rating} Stars & Up
-
             </button>
           </li>
         ))}

@@ -1,19 +1,22 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { subcategoriesByCategory } from "@/lib/products";
+import { useProducts } from "@/components/filters/FiltersProvider";
 import { useState } from "react";
 
 export default function SubcategoryFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const allProducts = useProducts();
   const selectedCategory = searchParams.get("category");
   const selectedSubcategory = searchParams.get("subcategory");
   const [isOpen, setIsOpen] = useState(true);
 
   if (!selectedCategory) return null;
 
-  const subcategoryList = subcategoriesByCategory[selectedCategory] ?? [];
+  const subcategoryList = Array.from(
+    new Set(allProducts.filter((p) => p.category === selectedCategory).map((p) => p.subcategory))
+  ).sort();
 
   function handleSelect(sub: string) {
     const params = new URLSearchParams(searchParams.toString());

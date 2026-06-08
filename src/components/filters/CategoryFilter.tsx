@@ -1,12 +1,15 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { categories } from "@/lib/products";
+import { useProducts } from "@/components/filters/FiltersProvider";
 
 export default function CategoryFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const allProducts = useProducts();
   const selected = searchParams.get("category");
+
+  const categories = Array.from(new Set(allProducts.map((p) => p.category))).sort();
 
   function handleSelect(category: string) {
     const params = new URLSearchParams(searchParams.toString());
