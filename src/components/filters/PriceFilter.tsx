@@ -1,40 +1,58 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useProducts } from "@/components/filters/FiltersProvider";
+import { applyFilters } from "@/lib/filterProducts";
 
 export default function PriceFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const allProducts = useProducts();
 
+  // Price range derived from products matching all active filters except price itself
   const { priceMin, priceMax } = useMemo(() => {
-    if (allProducts.length === 0) return { priceMin: 0, priceMax: 5000 };
-    const prices = allProducts.map((p) => p.price);
+    const filtered = applyFilters(allProducts, searchParams, ["minPrice", "maxPrice"]);
+    if (filtered.length === 0) return { priceMin: 0, priceMax: 5000 };
+    const prices = filtered.map((p) => p.price);
     return {
       priceMin: Math.floor(Math.min(...prices)),
       priceMax: Math.ceil(Math.max(...prices)),
     };
-  }, [allProducts]);
+  }, [allProducts, searchParams]);
+
+  const urlMin = searchParams.get("minPrice");
+  const urlMax = searchParams.get("maxPrice");
 
   const [localMin, setLocalMin] = useState(() =>
-    Number(searchParams.get("minPrice") ?? priceMin)
+    urlMin !== null ? Number(urlMin) : priceMin
   );
   const [localMax, setLocalMax] = useState(() =>
-    Number(searchParams.get("maxPrice") ?? priceMax)
+    urlMax !== null ? Number(urlMax) : priceMax
   );
-  const isFirstRender = useRef(true);
 
+  // Sync sliders when URL changes externally (Clear All, other filters changing range)
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+    const newMin = urlMin !== null ? Number(urlMin) : priceMin;
+    const newMax = urlMax !== null ? Number(urlMax) : priceMax;
+    setLocalMin(Math.max(priceMin, Math.min(priceMax, newMin)));
+    setLocalMax(Math.max(priceMin, Math.min(priceMax, newMax)));
+  }, [urlMin, urlMax, priceMin, priceMax]);
+
+  // Push to URL when user drags slider; skip if values are at the boundaries (= no filter)
+  useEffect(() => {
+    const prevMin = searchParams.get("minPrice");
+    const prevMax = searchParams.get("maxPrice");
+    const newMin = localMin > priceMin ? localMin.toString() : null;
+    const newMax = localMax < priceMax ? localMax.toString() : null;
+    if (prevMin === newMin && prevMax === newMax) return;
+
     const timer = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
-      params.set("minPrice", localMin.toString());
-      params.set("maxPrice", localMax.toString());
+      if (newMin) params.set("minPrice", newMin);
+      else params.delete("minPrice");
+      if (newMax) params.set("maxPrice", newMax);
+      else params.delete("maxPrice");
       router.push(`/products?${params.toString()}`);
     }, 300);
     return () => clearTimeout(timer);
