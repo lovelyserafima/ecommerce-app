@@ -4,7 +4,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const MAX_RECENT = 5;
-const FILTER_KEYS = ["category", "subcategory", "brands", "minPrice", "maxPrice", "minRating", "color", "size", "material", "availability"];
+const FILTER_KEYS = ["category", "subcategory", "brands", "minPrice", "maxPrice", "minRating", "color", "size", "material", "availability", "sort"];
+
+const SORT_LABELS: Record<string, string> = {
+  price_asc: "Price ↑",
+  price_desc: "Price ↓",
+  rating_desc: "Top Rated",
+  newest: "Newest",
+  popularity: "Popular",
+};
 
 function buildLabel(searchParams: URLSearchParams): string {
   const parts: string[] = [];
@@ -19,6 +27,8 @@ function buildLabel(searchParams: URLSearchParams): string {
   const max = searchParams.get("maxPrice");
   if (min || max) parts.push(`$${min ?? 0}–$${max ?? "∞"}`);
   if (searchParams.get("minRating")) parts.push(`${searchParams.get("minRating")}★+`);
+  const sort = searchParams.get("sort");
+  if (sort && SORT_LABELS[sort]) parts.push(SORT_LABELS[sort]);
   return parts.join(" · ") || "All products";
 }
 
