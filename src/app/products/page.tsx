@@ -15,6 +15,8 @@ import SubcategoryFilter from "@/components/filters/SubcategoryFilter";
 import AvailabilityFilter from "@/components/filters/AvailabilityFilter";
 import AttributeFilter from "@/components/filters/AttributeFilter";
 import { FiltersProvider } from "@/components/filters/FiltersProvider";
+import { DEFAULT_PER_PAGE } from "@/lib/constants";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +60,7 @@ export default async function ProductsPage({
     page, perPage, brands, color, size, material, availability, sku } = params;
 
   const currentPage = page ? Math.max(1, Number(page)) : 1;
-  const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 24;
+  const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : DEFAULT_PER_PAGE;
 
   const { products: paginated, total, allProducts } = await getProducts({
     search, category, subcategory, minPrice, maxPrice, minRating, sort,
@@ -81,6 +83,7 @@ export default async function ProductsPage({
       </div>
       <div className="flex gap-8">
         <aside style={{ width: "256px", minWidth: "256px", maxWidth: "256px" }} className="shrink-0 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-fit overflow-hidden">
+          <ErrorBoundary>
           <FiltersProvider products={allProducts}>
           <CategoryFilter />
           <SubcategoryFilter />
@@ -112,8 +115,10 @@ export default async function ProductsPage({
             <SavedSearches />
           </div>
           </FiltersProvider>
+          </ErrorBoundary>
         </aside>
         <div className="flex-1">
+          <ErrorBoundary>
           <div className="flex justify-end mb-4">
             <SaveSearch />
           </div>
@@ -124,6 +129,7 @@ export default async function ProductsPage({
             filterParams={filterParams}
             perPage={itemsPerPage}
           />
+          </ErrorBoundary>
         </div>
       </div>
     </main>

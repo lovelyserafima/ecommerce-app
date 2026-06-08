@@ -2,6 +2,7 @@ import type { IProductRepository } from "@/repositories/IProductRepository";
 import { PrismaProductRepository } from "@/repositories/PrismaProductRepository";
 import { MockProductRepository } from "@/repositories/MockProductRepository";
 import { applyFilters, applySort } from "@/lib/filterProducts";
+import { DEFAULT_PER_PAGE } from "@/lib/constants";
 import type { Product } from "@/types/product";
 
 function getRepository(): IProductRepository {
@@ -48,7 +49,7 @@ export async function getProducts(query: ProductQuery): Promise<ProductsResult> 
   const filtered = applySort(applyFilters(allProducts, urlParams), query.sort ?? null, query.search);
 
   const page = query.page ?? 1;
-  const perPage = query.perPage ?? 24;
+  const perPage = query.perPage ?? DEFAULT_PER_PAGE;
   const paginated = filtered.slice((page - 1) * perPage, page * perPage);
 
   return { products: paginated, total: filtered.length, allProducts };
