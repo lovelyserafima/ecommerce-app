@@ -93,9 +93,7 @@ export default async function ProductsPage({
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <PriceFilter />
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <RatingFilter />
-          </div>
+          <RatingFilter />
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <SortSelect />
           </div>

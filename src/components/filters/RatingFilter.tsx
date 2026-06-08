@@ -19,6 +19,8 @@ export default function RatingFilter() {
 
   const options = ratings.slice(1); // skip the lowest — it's the default (show all)
 
+  if (options.length === 0) return null;
+
   function handleSelect(rating: string) {
     const params = new URLSearchParams(searchParams.toString());
     if (selected === rating) {
@@ -30,7 +32,7 @@ export default function RatingFilter() {
   }
 
   return (
-    <div>
+    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
       <h3 className="font-semibold mb-2">Rating</h3>
       <ul className="space-y-1">
         {options.map((rating) => (
