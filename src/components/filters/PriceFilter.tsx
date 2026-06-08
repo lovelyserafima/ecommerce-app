@@ -61,11 +61,17 @@ export default function PriceFilter() {
   return (
     <div>
       <h3 className="font-semibold mb-2">Price</h3>
-      <div className="flex flex-col gap-2">
-        <input type="range" min={priceMin} max={priceMax} value={localMin} onChange={(e) => setLocalMin(Number(e.target.value))} />
-        <input type="range" min={priceMin} max={priceMax} value={localMax} onChange={(e) => setLocalMax(Number(e.target.value))} />
-      </div>
-      <div className="text-sm mt-2">${localMin} – ${localMax}</div>
+      {priceMin === priceMax ? (
+        <div className="text-sm text-gray-500">${priceMin}</div>
+      ) : (
+        <>
+          <div className="flex flex-col gap-2">
+            <input type="range" min={priceMin} max={priceMax} value={localMin} onChange={(e) => setLocalMin(Number(e.target.value))} />
+            <input type="range" min={priceMin} max={priceMax} value={localMax} onChange={(e) => setLocalMax(Number(e.target.value))} />
+          </div>
+          <div className="text-sm mt-2">${localMin} – ${localMax}</div>
+        </>
+      )}
     </div>
   );
 }
