@@ -411,33 +411,7 @@ export const products: Product[] = [
   },
 ];
 
-export const categories = Array.from(new Set(products.map((p) => p.category)));
-
-export const ratings = Array.from(new Set(products.map((p) => Math.floor(p.rating.average))));
-
-export const sortOptions = [
-  { label: "Price: Low to High", value: "price_asc" },
-  { label: "Price: High to Low", value: "price_desc" },
-  { label: "Rating: High to Low", value: "rating_desc" },
-  { label: "Newest Arrivals", value: "newest" },
-  { label: "Popularity", value: "popularity" },
-  { label: "Relevance", value: "relevance" },
-];
-
-export const brands = Array.from(new Set(products.map((p) => p.brand)));
-
-export const colors = Array.from(new Set(products.map((p) => p.attributes.color)));
-
 export function toSlug(str: string) {
   return str.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
 }
 
-export function getProductBySlug(slug: string) {
-  return products.find(p => toSlug(p.name) === slug);
-}
-
-export const subcategoriesByCategory = products.reduce<Record<string, string[]>>((acc, p) => {
-  if (!acc[p.category]) acc[p.category] = [];
-  if (!acc[p.category].includes(p.subcategory)) acc[p.category].push(p.subcategory);
-  return acc;
-}, {});
