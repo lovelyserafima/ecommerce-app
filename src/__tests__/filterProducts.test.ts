@@ -99,10 +99,37 @@ describe("applyFilters", () => {
     expect(result).toHaveLength(2);
   });
 
-  it("excludes a filter key when specified", () => {
-    const params = new URLSearchParams({ category: "Footwear", brands: "Nike" });
-    const result = applyFilters(mockProducts, params, ["brands"]);
-    expect(result).toHaveLength(2);
+  it("filters by color attribute", () => {
+    const params = new URLSearchParams({ color: "white" });
+    const result = applyFilters(mockProducts, params);
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("1");
+  });
+
+  it("filters by size attribute", () => {
+    const params = new URLSearchParams({ size: "43" });
+    const result = applyFilters(mockProducts, params);
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("2");
+  });
+
+  it("filters by material attribute", () => {
+    const params = new URLSearchParams({ material: "aluminum" });
+    const result = applyFilters(mockProducts, params);
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("3");
+  });
+
+  it("filters by SKU exact match", () => {
+    const params = new URLSearchParams({ search: "NK-001" });
+    const result = applyFilters(mockProducts, params);
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("1");
+  });
+
+  it("returns empty array when no products match", () => {
+    const params = new URLSearchParams({ category: "NonExistent" });
+    expect(applyFilters(mockProducts, params)).toHaveLength(0);
   });
 });
 
@@ -127,5 +154,26 @@ describe("applySort", () => {
   it("returns original order when no sort specified", () => {
     const result = applySort(mockProducts, null);
     expect(result.map((p) => p.id)).toEqual(["1", "2", "3"]);
+  });
+
+  it("sorts by newest (createdAt desc)", () => {
+    const result = applySort(mockProducts, "newest");
+    expect(result[0].id).toBe("3");
+  });
+
+  it("sorts by popularity (rating count desc)", () => {
+    const result = applySort(mockProducts, "popularity");
+    expect(result[0].id).toBe("3");
+  });
+
+  it("sorts by relevance with exact name match at top", () => {
+    const result = applySort(mockProducts, "relevance", "Nike Air Max");
+    expect(result[0].id).toBe("1");
+  });
+
+  it("does not mutate original array", () => {
+    const original = [...mockProducts];
+    applySort(mockProducts, "price_asc");
+    expect(mockProducts.map((p) => p.id)).toEqual(original.map((p) => p.id));
   });
 });

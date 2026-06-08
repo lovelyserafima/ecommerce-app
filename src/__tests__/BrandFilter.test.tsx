@@ -3,9 +3,12 @@ import BrandFilter from "@/components/filters/BrandFilter";
 import { FiltersProvider } from "@/components/filters/FiltersProvider";
 import type { Product } from "@/types/product";
 
+const mockPush = jest.fn();
+const mockUseSearchParams = jest.fn(() => new URLSearchParams());
+
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: jest.fn() }),
-  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: mockPush }),
+  useSearchParams: () => mockUseSearchParams(),
 }));
 
 const products: Product[] = [
@@ -32,6 +35,11 @@ function renderWithProvider() {
 }
 
 describe("BrandFilter", () => {
+  beforeEach(() => {
+    mockPush.mockClear();
+    mockUseSearchParams.mockReturnValue(new URLSearchParams());
+  });
+
   it("renders brand list", () => {
     renderWithProvider();
     expect(screen.getByText("Nike")).toBeInTheDocument();
@@ -48,5 +56,22 @@ describe("BrandFilter", () => {
     const toggle = screen.getByText("Brand").closest("button")!;
     fireEvent.click(toggle);
     expect(screen.queryByText("Nike")).not.toBeInTheDocument();
+  });
+
+  it("calls router.push with brand param when brand clicked", () => {
+    renderWithProvider();
+    fireEvent.click(screen.getByText("Nike"));
+    expect(mockPush).toHaveBeenCalledWith(
+      expect.stringContaining("brands=Nike")
+    );
+  });
+
+  it("deselects brand when clicking already selected brand", () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams({ brands: "Nike" }));
+    renderWithProvider();
+    fireEvent.click(screen.getByText("Nike"));
+    expect(mockPush).toHaveBeenCalledWith(
+      expect.not.stringContaining("brands=Nike")
+    );
   });
 });
