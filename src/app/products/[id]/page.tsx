@@ -57,9 +57,7 @@ export default async function ProductPage({
           {product.availability === "out_of_stock" ? (
             <span className="text-red-500 font-medium">Out of stock</span>
           ) : (
-            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-              Add to Cart
-            </button>
+            <span className="text-green-500 font-medium">In stock</span>
           )}
         </div>
       </div>
