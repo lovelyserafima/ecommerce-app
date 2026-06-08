@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Availability {
+  in_stock
+  out_of_stock
+  pre_order
+}
+
+model Product {
+  id            String       @id
+  name          String
+  brand         String
+  category      String
+  subcategory   String
+  description   String
+  price         Float
+  originalPrice Float?
+  images        String[]
+  sku           String       @unique
+  slug          String       @unique
+  ratingAverage Float
+  ratingCount   Int
+  availability  Availability
+  attributes    Json
+  createdAt     DateTime     @default(now())
+}

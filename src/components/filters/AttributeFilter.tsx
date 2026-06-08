@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { applyFilters } from "@/lib/filterProducts";
+import { useProducts } from "@/components/filters/FiltersProvider";
 import { useState } from "react";
 
 interface Props {
@@ -12,8 +13,9 @@ interface Props {
 export default function AttributeFilter({ attribute, label }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const products = useProducts();
 
-  const available = applyFilters(searchParams, [attribute]);
+  const available = applyFilters(products, searchParams, [attribute]);
   const values = Array.from(
     new Set(available.map(p => String(p.attributes[attribute])).filter(v => v !== "undefined"))
   );

@@ -1,24 +1,22 @@
 import { NextResponse } from "next/server";
-import { products } from "@/lib/products";
+import { getAllProducts } from "@/lib/catalog";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  
   const search = searchParams.get("q");
 
-
-  let filtered = products;
+  const products = await getAllProducts();
 
   // Filter by name or brand containing the search query
-  if (search) {
-    filtered = filtered.filter(
-      (product) =>
-        product.name.toLowerCase().includes(search.toLowerCase()) ||
-        product.brand.toLowerCase().includes(search.toLowerCase())
-    );
-  }
+  const filtered = search
+    ? products.filter(
+        (p) =>
+          p.name.toLowerCase().includes(search.toLowerCase()) ||
+          p.brand.toLowerCase().includes(search.toLowerCase())
+      )
+    : products;
 
-  filtered = filtered.slice(0, 5);
-
-  return NextResponse.json(filtered.map(({ id, name }) => ({ id, name })));
+  return NextResponse.json(
+    filtered.slice(0, 5).map(({ id, name }) => ({ id, name }))
+  );
 }

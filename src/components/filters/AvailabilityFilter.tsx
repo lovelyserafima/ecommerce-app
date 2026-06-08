@@ -2,13 +2,15 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { applyFilters } from "@/lib/filterProducts";
+import { useProducts } from "@/components/filters/FiltersProvider";
 
 export default function AvailabilityFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const products = useProducts();
   const selected = searchParams.get("availability");
 
-  const available = applyFilters(searchParams, ["availability"]);
+  const available = applyFilters(products, searchParams, ["availability"]);
   const availableValues = new Set<string>(available.map(p => p.availability));
 
   const availabilities = [

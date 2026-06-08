@@ -1,13 +1,13 @@
-import { products as allProducts } from "@/lib/products";
 import type { Product } from "@/types/product";
 
 export function applyFilters(
+  items: Product[],
   params: URLSearchParams,
   exclude: string[] = []
 ): Product[] {
   const get = (key: string) => (exclude.includes(key) ? null : params.get(key));
 
-  return allProducts.filter((p) => {
+  return items.filter((p) => {
     const search = get("search");
     if (search && !(
       p.name.toLowerCase().includes(search.toLowerCase()) ||

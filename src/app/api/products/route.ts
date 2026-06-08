@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { applyFilters, applySort } from "@/lib/filterProducts";
+import { getAllProducts } from "@/lib/catalog";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -7,8 +8,9 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
   const perPage = Math.max(1, Number(searchParams.get("perPage") ?? 24));
 
+  const allProducts = await getAllProducts();
   const filtered = applySort(
-    applyFilters(searchParams),
+    applyFilters(allProducts, searchParams),
     searchParams.get("sort"),
     searchParams.get("search")
   );

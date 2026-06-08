@@ -1,4 +1,5 @@
 import { applyFilters, applySort } from "@/lib/filterProducts";
+import { getAllProducts } from "@/lib/catalog";
 import ProductGrid from "@/components/products/ProductGrid";
 import SearchBar from "@/components/search/SearchBar";
 import CategoryFilter from "@/components/filters/CategoryFilter";
@@ -14,6 +15,7 @@ import { Metadata } from "next";
 import SubcategoryFilter from "@/components/filters/SubcategoryFilter";
 import AvailabilityFilter from "@/components/filters/AvailabilityFilter";
 import AttributeFilter from "@/components/filters/AttributeFilter";
+import { FiltersProvider } from "@/components/filters/FiltersProvider";
 
 type SearchParams = {
   search?: string;
@@ -58,7 +60,8 @@ export default async function ProductsPage({
     Object.entries(params).filter(([, v]) => v !== undefined) as [string, string][]
   );
 
-  const filtered = applySort(applyFilters(urlParams), sort ?? null, search);
+  const allProducts = await getAllProducts();
+  const filtered = applySort(applyFilters(allProducts, urlParams), sort ?? null, search);
 
   const currentPage = page ? Math.max(1, Number(page)) : 1;
   const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 24;
@@ -78,6 +81,7 @@ export default async function ProductsPage({
       </div>
       <div className="flex gap-8">
         <aside style={{ width: "256px", minWidth: "256px", maxWidth: "256px" }} className="shrink-0 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-fit overflow-hidden">
+          <FiltersProvider products={allProducts}>
           <CategoryFilter />
           <SubcategoryFilter />
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -107,6 +111,7 @@ export default async function ProductsPage({
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <SavedSearches />
           </div>
+          </FiltersProvider>
         </aside>
         <div className="flex-1">
           <div className="flex justify-end mb-4">
