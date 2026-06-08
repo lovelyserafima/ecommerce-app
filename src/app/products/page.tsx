@@ -1,19 +1,19 @@
 import { products } from "@/lib/products";
-import ProductGrid from "@/components/ProductGrid";
-import SearchBar from "@/components/SearchBar";
-import CategoryFilter from "@/components/CategoryFilter";
-import PriceFilter from "@/components/PriceFilter";
-import RatingFilter from "@/components/RatingFilter";
-import SortSelect from "@/components/SortSelect";
-import ResetFilters from "@/components/ResetFilters";
-import SavedSearches from "@/components/SavedSearches";
-import SaveSearch from "@/components/SaveSearch";
-import BrandFilter from "@/components/BrandFilter";
-import PerPageSelect from "@/components/PerPageSelect";
+import ProductGrid from "@/components/products/ProductGrid";
+import SearchBar from "@/components/search/SearchBar";
+import CategoryFilter from "@/components/filters/CategoryFilter";
+import PriceFilter from "@/components/filters/PriceFilter";
+import RatingFilter from "@/components/filters/RatingFilter";
+import SortSelect from "@/components/ui/SortSelect";
+import ResetFilters from "@/components/filters/ResetFilters";
+import SavedSearches from "@/components/search/SavedSearches";
+import SaveSearch from "@/components/search/SaveSearch";
+import BrandFilter from "@/components/filters/BrandFilter";
+import PerPageSelect from "@/components/ui/PerPageSelect";
 import { Metadata } from "next";
-import SubcategoryFilter from "@/components/SubcategoryFilter";
-import AvailabilityFilter from "@/components/AvailabilityFilter";
-import AttributeFilter from "@/components/AttributeFilter";
+import SubcategoryFilter from "@/components/filters/SubcategoryFilter";
+import AvailabilityFilter from "@/components/filters/AvailabilityFilter";
+import AttributeFilter from "@/components/filters/AttributeFilter";
 
 export async function generateMetadata({
   searchParams,

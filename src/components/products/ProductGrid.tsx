@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Product } from "@/types/product";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/products/ProductCard";
 
 interface Props {
   initialProducts: Product[];
