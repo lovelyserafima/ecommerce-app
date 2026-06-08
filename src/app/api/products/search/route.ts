@@ -1,21 +1,13 @@
 import { NextResponse } from "next/server";
-import { getProducts } from "@/services/productService";
+import { getRepository } from "@/services/productService";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("q");
 
-  const { allProducts } = await getProducts({ search });
+  if (!search || search.length < 2) return NextResponse.json([]);
 
-  const filtered = search
-    ? allProducts.filter(
-        (p) =>
-          p.name.toLowerCase().includes(search.toLowerCase()) ||
-          p.brand.toLowerCase().includes(search.toLowerCase())
-      )
-    : allProducts;
+  const { products } = await getRepository().findMany({ search, perPage: 5 });
 
-  return NextResponse.json(
-    filtered.slice(0, 5).map(({ id, name }) => ({ id, name }))
-  );
+  return NextResponse.json(products.map(({ id, name }) => ({ id, name })));
 }

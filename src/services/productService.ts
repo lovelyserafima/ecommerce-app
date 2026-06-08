@@ -3,7 +3,7 @@ import { PrismaProductRepository } from "@/repositories/PrismaProductRepository"
 import { MockProductRepository } from "@/repositories/MockProductRepository";
 import type { Product } from "@/types/product";
 
-function getRepository(): IProductRepository {
+export function getRepository(): IProductRepository {
   if (process.env.DATABASE_URL) {
     return new PrismaProductRepository();
   }
