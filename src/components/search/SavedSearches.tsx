@@ -1,56 +1,77 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+
+const MAX_RECENT = 5;
 
 export default function SavedSearches() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
-  const [savedSearches, setSavedSearches] = useState<{name: string, params: string}[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   useEffect(() => {
-    setSavedSearches(JSON.parse(localStorage.getItem("savedSearches") ?? "[]"));
+    setRecentSearches(JSON.parse(localStorage.getItem("recentSearches") ?? "[]"));
     setMounted(true);
-
-    const handleStorageChange = () => {
-      setSavedSearches(JSON.parse(localStorage.getItem("savedSearches") ?? "[]"));
-    };
-    window.addEventListener("savedSearchesUpdated", handleStorageChange);
-    return () => window.removeEventListener("savedSearchesUpdated", handleStorageChange);
   }, []);
 
-  if (!mounted) return null;
+  // Auto-save when user performs a search
+  useEffect(() => {
+    const term = searchParams.get("search")?.trim();
+    if (!term) return;
+
+    setRecentSearches((prev) => {
+      const updated = [term, ...prev.filter((s) => s !== term)].slice(0, MAX_RECENT);
+      localStorage.setItem("recentSearches", JSON.stringify(updated));
+      return updated;
+    });
+  }, [searchParams.get("search")]);
+
+  if (!mounted || recentSearches.length === 0) return null;
+
+  function remove(term: string) {
+    setRecentSearches((prev) => {
+      const updated = prev.filter((s) => s !== term);
+      localStorage.setItem("recentSearches", JSON.stringify(updated));
+      return updated;
+    });
+  }
+
+  function clearAll() {
+    localStorage.removeItem("recentSearches");
+    setRecentSearches([]);
+  }
 
   return (
     <div>
-      {savedSearches.length > 0 && (
-        <>
-          <h3 className="font-semibold mb-2">Previous Searches</h3>
-          <button
-            onClick={() => { localStorage.removeItem("savedSearches"); setSavedSearches([]); }}
-            className="text-sm px-2 py-1 border rounded hover:bg-gray-100 dark:hover:bg-gray-700 mb-2"
-          >
-        Clear All
-      </button>
-      <ul className="space-y-2">
-        {savedSearches.map((save, index) => (
-          <li key={index} className="text-sm text-blue-600 hover:underline cursor-pointer"
-            onClick={() => router.push(`/products?${save.params}`)}>
-            {save.name} <button
-              onClick={(e) => {
-                localStorage.setItem("savedSearches", JSON.stringify(savedSearches.filter((_, i) => i !== index)));
-                window.dispatchEvent(new Event("savedSearchesUpdated"));
-                e.stopPropagation();
-              }}
-              className="text-xs text-red-500 ml-2"
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-semibold">Recent Searches</h3>
+        <button
+          onClick={clearAll}
+          className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+        >
+          Clear
+        </button>
+      </div>
+      <ul className="space-y-1">
+        {recentSearches.map((term) => (
+          <li key={term} className="flex items-center justify-between group">
+            <button
+              onClick={() => router.push(`/products?search=${encodeURIComponent(term)}`)}
+              className="text-sm text-blue-500 hover:underline truncate"
             >
-              x
+              {term}
+            </button>
+            <button
+              onClick={() => remove(term)}
+              className="text-xs text-gray-300 hover:text-red-400 ml-1 opacity-0 group-hover:opacity-100"
+            >
+              ✕
             </button>
           </li>
         ))}
       </ul>
-      </>
-      )}
     </div>
   );
 }

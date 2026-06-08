@@ -7,7 +7,6 @@ import RatingFilter from "@/components/filters/RatingFilter";
 import SortSelect from "@/components/ui/SortSelect";
 import ResetFilters from "@/components/filters/ResetFilters";
 import SavedSearches from "@/components/search/SavedSearches";
-import SaveSearch from "@/components/search/SaveSearch";
 import BrandFilter from "@/components/filters/BrandFilter";
 import PerPageSelect from "@/components/ui/PerPageSelect";
 import { Metadata } from "next";
@@ -87,6 +86,9 @@ export default async function ProductsPage({
           <FiltersProvider products={allProducts}>
           <ResetFilters />
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <SavedSearches />
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <CategoryFilter />
           </div>
           <SubcategoryFilter />
@@ -111,17 +113,11 @@ export default async function ProductsPage({
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <PerPageSelect />
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <SavedSearches />
-          </div>
           </FiltersProvider>
           </ErrorBoundary>
         </aside>
         <div className="flex-1">
           <ErrorBoundary>
-          <div className="flex justify-end mb-4">
-            <SaveSearch />
-          </div>
           <ProductGrid
             key={JSON.stringify(filterParams)}
             initialProducts={paginated}
