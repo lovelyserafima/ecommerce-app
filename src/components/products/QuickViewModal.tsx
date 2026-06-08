@@ -21,9 +21,15 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
             <p className="text-gray-600 dark:text-gray-400">{product.description}</p>
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold">${product.price}</span>
-              <span className={`px-2 py-1 text-xs rounded ${product.availability === "in_stock" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                {product.availability === "in_stock" ? "In Stock" : "Out of Stock"}
-              </span>
+              {product.availability === "in_stock" && (
+                <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">In Stock</span>
+              )}
+              {product.availability === "pre_order" && (
+                <span className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">Pre-order</span>
+              )}
+              {product.availability === "out_of_stock" && (
+                <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800">Out of Stock</span>
+              )}
             </div>
             </div>
         </div>

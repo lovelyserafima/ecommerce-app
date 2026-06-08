@@ -34,10 +34,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           <p className="text-yellow-500 text-sm mb-4">
             ⭐ {product.rating.average} ({product.rating.count.toLocaleString()} reviews)
           </p>
-          {product.availability === "out_of_stock" ? (
-            <span className="text-red-500 font-medium">Out of stock</span>
-          ) : (
+          {product.availability === "in_stock" && (
             <span className="text-green-500 font-medium">In stock</span>
+          )}
+          {product.availability === "pre_order" && (
+            <span className="text-yellow-500 font-medium">Pre-order</span>
+          )}
+          {product.availability === "out_of_stock" && (
+            <span className="text-red-500 font-medium">Out of stock</span>
           )}
         </div>
       </div>
