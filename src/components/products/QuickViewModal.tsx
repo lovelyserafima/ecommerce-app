@@ -13,7 +13,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
       onClick={onClose}>
       <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg w-full mx-4"
         onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl">✕</button>
+        <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl">✕</button>
         <div className="flex flex-col md:flex-row gap-6">
           <img src={product.images[0]} alt={product.name} className="w-full md:w-1/2 h-auto object-cover rounded" />
           <div className="flex flex-col gap-4">

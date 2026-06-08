@@ -14,7 +14,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   return (
-    <div className="border rounded-lg p-4 group relative cursor-pointer" onClick={() => router.push(`/products/${product.slug}`)}>
+    <div className="border rounded-lg p-4 group relative cursor-pointer" onClick={() => router.push(`/products/${product.slug ?? product.id}`)}>
       <div className="w-full h-[192px] overflow-hidden rounded-t-lg relative">
         <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
         <button

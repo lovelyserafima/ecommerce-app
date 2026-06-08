@@ -49,6 +49,7 @@ export default function SearchBar() {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Search products..."
+        aria-label="Search products"
         className="border rounded-lg px-4 py-2 w-full"
       />
       {suggestions.length > 0 && (
