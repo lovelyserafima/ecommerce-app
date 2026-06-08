@@ -9,7 +9,7 @@ export default function AvailabilityFilter() {
   const selected = searchParams.get("availability");
 
   const available = applyFilters(searchParams, ["availability"]);
-  const availableValues = new Set(available.map(p => p.availability));
+  const availableValues = new Set<string>(available.map(p => p.availability));
 
   const availabilities = [
     { value: "in_stock", label: "In Stock" },
