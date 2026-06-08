@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 
   let filtered = products;
 
-  // 1. Фильтр по поиску (name или brand содержит search)
+  // Filter by name or brand containing the search query
   if (search) {
     filtered = filtered.filter(
       (product) =>

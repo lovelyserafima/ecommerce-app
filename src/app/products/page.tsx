@@ -1,4 +1,4 @@
-import { products } from "@/lib/products";
+import { applyFilters, applySort } from "@/lib/filterProducts";
 import ProductGrid from "@/components/products/ProductGrid";
 import SearchBar from "@/components/search/SearchBar";
 import CategoryFilter from "@/components/filters/CategoryFilter";
@@ -15,12 +15,28 @@ import SubcategoryFilter from "@/components/filters/SubcategoryFilter";
 import AvailabilityFilter from "@/components/filters/AvailabilityFilter";
 import AttributeFilter from "@/components/filters/AttributeFilter";
 
+type SearchParams = {
+  search?: string;
+  category?: string;
+  subcategory?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  minRating?: string;
+  sort?: string;
+  page?: string;
+  perPage?: string;
+  brands?: string;
+  color?: string;
+  size?: string;
+  material?: string;
+  availability?: string;
+  sku?: string;
+};
+
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; category?: string; subcategory?: string; minPrice?: string; maxPrice?: string; 
-    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; colors?: string; availability?: string; 
-    sizes?: string; materials?: string; sku?: string; description?: string;}>;
+  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { search, category } = await searchParams;
   let title = "Product Catalog";
@@ -32,64 +48,25 @@ export async function generateMetadata({
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; category?: string; subcategory?: string; minPrice?: string; maxPrice?: string;
-    minRating?: string; sort?: string; page?: string; perPage?: string; brands?: string; color?: string;
-    size?: string; material?: string; availability?: string; sku?: string; description?: string; }>;
+  searchParams: Promise<SearchParams>;
 }) {
-  const { search, category, subcategory, minPrice, maxPrice, minRating, sort, page, perPage, brands, color,
-    size, material, availability, sku, description } = await searchParams;
+  const params = await searchParams;
+  const { search, category, subcategory, minPrice, maxPrice, minRating, sort,
+    page, perPage, brands, color, size, material, availability, sku } = params;
 
-  let filtered = products.filter((p) => {
-    const matchesSearch = search
-      ? p.name.toLowerCase().includes(search.toLowerCase()) || p.brand.toLowerCase().includes(search.toLowerCase()) || 
-      p.description.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase() === search.toLowerCase()
-      : true;
-    const matchesCategory = category ? p.category === category : true;
-    const matchesSubcategory = subcategory ? p.subcategory === subcategory : true;
-    const matchesMinPrice = minPrice ? p.price >= Number(minPrice) : true;
-    const matchesMaxPrice = maxPrice ? p.price <= Number(maxPrice) : true;
-    const matchesMinRating = minRating ? p.rating.average >= Number(minRating) : true;
-    const matchesBrands = brands ? brands.split(",").includes(p.brand) : true;
-    const matchesColors = color ? color.split(",").includes(String(p.attributes.color)) : true;
-    const matchesSizes = size ? size.split(",").includes(String(p.attributes.size)) : true;
-    const matchesMaterials = material ? material.split(",").includes(String(p.attributes.material)) : true;
-    const matchesAvailability = availability ? p.availability === availability : true;
-    const matchesSku = sku ? p.sku === sku : true;
-    const matchesDescription = description ? p.description.toLowerCase().includes(description.toLowerCase()) : true;
-    return matchesSearch && matchesCategory && matchesSubcategory && matchesMinPrice && matchesMaxPrice && 
-    matchesMinRating && matchesBrands && matchesColors && matchesSizes && matchesMaterials && 
-    matchesAvailability && matchesSku && matchesDescription;
-  });
+  const urlParams = new URLSearchParams(
+    Object.entries(params).filter(([, v]) => v !== undefined) as [string, string][]
+  );
 
-  if (sort === "price_asc") {
-      filtered.sort((a, b) => a.price - b.price);
-  } else if (sort === "price_desc") {
-      filtered.sort((a, b) => b.price - a.price);
-  } else if (sort === "rating_desc") {
-      filtered.sort((a, b) => b.rating.average - a.rating.average);
-  } else if (sort === "newest") {
-      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  } else if (sort === "popularity") {
-      filtered.sort((a, b) => b.rating.count - a.rating.count);
-  } else if (sort === "relevance" && search) {
-      const q = search.toLowerCase();
-      const score = (p: typeof filtered[0]) => {
-        if (p.name.toLowerCase() === q) return 3;
-        if (p.name.toLowerCase().includes(q)) return 2;
-        if (p.brand.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)) return 1;
-        return 0;
-      };
-      filtered.sort((a, b) => score(b) - score(a));
-  }
+  const filtered = applySort(applyFilters(urlParams), sort ?? null, search);
 
   const currentPage = page ? Math.max(1, Number(page)) : 1;
   const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 24;
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
+  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  const paginationParams = Object.fromEntries(
-    Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating, sort, brands, color, size, material, availability, perPage })
+  const filterParams = Object.fromEntries(
+    Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating,
+      sort, brands, color, size, material, availability, sku })
       .filter(([, v]) => v !== undefined) as [string, string][]
   );
 
@@ -100,7 +77,7 @@ export default async function ProductsPage({
         <SearchBar />
       </div>
       <div className="flex gap-8">
-        <aside style={{ width: '256px', minWidth: '256px', maxWidth: '256px' }} className="shrink-0 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-fit overflow-hidden">
+        <aside style={{ width: "256px", minWidth: "256px", maxWidth: "256px" }} className="shrink-0 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-fit overflow-hidden">
           <CategoryFilter />
           <SubcategoryFilter />
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -136,13 +113,10 @@ export default async function ProductsPage({
             <SaveSearch />
           </div>
           <ProductGrid
-            key={JSON.stringify({ search, category, subcategory, minPrice, maxPrice, minRating, brands, color, size, material, availability, sort, perPage })}
+            key={JSON.stringify(filterParams)}
             initialProducts={paginated}
             total={filtered.length}
-            filterParams={Object.fromEntries(
-              Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating, sort, brands, color, size, material, availability })
-                .filter(([, v]) => v !== undefined) as [string, string][]
-            )}
+            filterParams={filterParams}
             perPage={itemsPerPage}
           />
         </div>

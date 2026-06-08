@@ -9,7 +9,7 @@ export default function PerPageSelect() {
   function handleChange(value: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("perPage", value);
-    params.set("page", "1"); // сбрасываем на первую страницу
+    params.set("page", "1"); // reset to first page
     router.push(`/products?${params.toString()}`);
   }
 

@@ -28,13 +28,7 @@ export default function SortSelect() {
       >
         <option value="">Default</option>
         {sortOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-            className={`text-sm w-full text-left px-2 py-1 rounded ${
-              selected === option.value ? "bg-blue-500 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"
-            }`}
-          >
+          <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}
