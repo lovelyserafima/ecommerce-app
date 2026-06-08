@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { applyFilters, applySort } from "@/lib/filterProducts";
-import { getAllProducts } from "@/lib/catalog";
+import { getProducts } from "@/services/productService";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,15 +7,23 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
   const perPage = Math.max(1, Number(searchParams.get("perPage") ?? 24));
 
-  const allProducts = await getAllProducts();
-  const filtered = applySort(
-    applyFilters(allProducts, searchParams),
-    searchParams.get("sort"),
-    searchParams.get("search")
-  );
+  const { products, total } = await getProducts({
+    search: searchParams.get("search"),
+    category: searchParams.get("category"),
+    subcategory: searchParams.get("subcategory"),
+    minPrice: searchParams.get("minPrice"),
+    maxPrice: searchParams.get("maxPrice"),
+    minRating: searchParams.get("minRating"),
+    sort: searchParams.get("sort"),
+    brands: searchParams.get("brands"),
+    color: searchParams.get("color"),
+    size: searchParams.get("size"),
+    material: searchParams.get("material"),
+    availability: searchParams.get("availability"),
+    sku: searchParams.get("sku"),
+    page,
+    perPage,
+  });
 
-  const total = filtered.length;
-  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
-
-  return NextResponse.json({ products: paginated, total });
+  return NextResponse.json({ products, total });
 }

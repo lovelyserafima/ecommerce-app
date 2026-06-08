@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
-import { getAllProducts } from "@/lib/catalog";
+import { getProducts } from "@/services/productService";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("q");
 
-  const products = await getAllProducts();
+  const { allProducts } = await getProducts({ search });
 
-  // Filter by name or brand containing the search query
   const filtered = search
-    ? products.filter(
+    ? allProducts.filter(
         (p) =>
           p.name.toLowerCase().includes(search.toLowerCase()) ||
           p.brand.toLowerCase().includes(search.toLowerCase())
       )
-    : products;
+    : allProducts;
 
   return NextResponse.json(
     filtered.slice(0, 5).map(({ id, name }) => ({ id, name }))

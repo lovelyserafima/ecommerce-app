@@ -1,5 +1,4 @@
-import { applyFilters, applySort } from "@/lib/filterProducts";
-import { getAllProducts } from "@/lib/catalog";
+import { getProducts } from "@/services/productService";
 import ProductGrid from "@/components/products/ProductGrid";
 import SearchBar from "@/components/search/SearchBar";
 import CategoryFilter from "@/components/filters/CategoryFilter";
@@ -58,16 +57,15 @@ export default async function ProductsPage({
   const { search, category, subcategory, minPrice, maxPrice, minRating, sort,
     page, perPage, brands, color, size, material, availability, sku } = params;
 
-  const urlParams = new URLSearchParams(
-    Object.entries(params).filter(([, v]) => v !== undefined) as [string, string][]
-  );
-
-  const allProducts = await getAllProducts();
-  const filtered = applySort(applyFilters(allProducts, urlParams), sort ?? null, search);
-
   const currentPage = page ? Math.max(1, Number(page)) : 1;
   const itemsPerPage = perPage ? Math.max(1, Number(perPage)) : 24;
-  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const { products: paginated, total, allProducts } = await getProducts({
+    search, category, subcategory, minPrice, maxPrice, minRating, sort,
+    brands, color, size, material, availability, sku,
+    page: currentPage,
+    perPage: itemsPerPage,
+  });
 
   const filterParams = Object.fromEntries(
     Object.entries({ search, category, subcategory, minPrice, maxPrice, minRating,
@@ -122,7 +120,7 @@ export default async function ProductsPage({
           <ProductGrid
             key={JSON.stringify(filterParams)}
             initialProducts={paginated}
-            total={filtered.length}
+            total={total}
             filterParams={filterParams}
             perPage={itemsPerPage}
           />

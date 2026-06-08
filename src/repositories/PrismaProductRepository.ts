@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/db";
-import { products as mockProducts } from "@/lib/products";
+import type { IProductRepository } from "@/repositories/IProductRepository";
 import type { Product } from "@/types/product";
 import type { Availability } from "@/generated/prisma/client";
+import { prisma } from "@/lib/db";
 
 function dbRowToProduct(row: {
   id: string; name: string; brand: string; category: string; subcategory: string;
@@ -28,13 +28,9 @@ function dbRowToProduct(row: {
   };
 }
 
-export async function getAllProducts(): Promise<Product[]> {
-  if (!process.env.DATABASE_URL) return mockProducts;
-
-  try {
+export class PrismaProductRepository implements IProductRepository {
+  async findAll(): Promise<Product[]> {
     const rows = await prisma.product.findMany({ orderBy: { createdAt: "desc" } });
     return rows.map(dbRowToProduct);
-  } catch {
-    return mockProducts;
   }
 }
