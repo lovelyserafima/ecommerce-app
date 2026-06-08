@@ -85,7 +85,10 @@ export default async function ProductsPage({
         <aside style={{ width: "256px", minWidth: "256px", maxWidth: "256px" }} className="shrink-0 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 h-fit overflow-hidden">
           <ErrorBoundary>
           <FiltersProvider products={allProducts}>
-          <CategoryFilter />
+          <ResetFilters />
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <CategoryFilter />
+          </div>
           <SubcategoryFilter />
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <PriceFilter />
@@ -107,9 +110,6 @@ export default async function ProductsPage({
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <PerPageSelect />
-          </div>
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <ResetFilters />
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <SavedSearches />
