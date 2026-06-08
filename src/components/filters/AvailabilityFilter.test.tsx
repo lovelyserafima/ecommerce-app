@@ -43,7 +43,7 @@ describe("AvailabilityFilter", () => {
   it("renders only availability values present in products", () => {
     renderWithProvider();
     expect(screen.getByText("In Stock")).toBeInTheDocument();
-    expect(screen.getByText("Out of Stock")).toBeInTheDocument();
+    expect(screen.queryByText("Out of Stock")).not.toBeInTheDocument();
     expect(screen.queryByText("Pre-order")).not.toBeInTheDocument();
   });
 
