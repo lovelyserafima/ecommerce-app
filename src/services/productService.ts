@@ -10,7 +10,7 @@ export function getRepository(): IProductRepository {
   return new MockProductRepository();
 }
 
-export type ProductQuery = {
+type ProductQuery = {
   search?: string | null;
   category?: string | null;
   subcategory?: string | null;
@@ -28,7 +28,7 @@ export type ProductQuery = {
   perPage?: number;
 };
 
-export type ProductsResult = {
+type ProductsResult = {
   products: Product[];
   total: number;
   allProducts: Product[];
